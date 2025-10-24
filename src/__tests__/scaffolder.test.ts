@@ -257,7 +257,7 @@ describe('scaffolder.ts', () => {
       expect(config.dependencies).toHaveProperty('tailwindcss', '^4.1.16')
       expect(config.dependencies).toHaveProperty('class-variance-authority', '^0.7.1')
       expect(config.dependencies).toHaveProperty('clsx', '^2.1.1')
-      expect(config.dependencies).toHaveProperty('tailwind-merge', '^2.7.0')
+      expect(config.dependencies).toHaveProperty('tailwind-merge', '^3.3.1')
       expect(config.dependencies).toHaveProperty('lucide-react', '^0.468.0')
       expect(config.dependencies).toHaveProperty('tw-animate-css', '^1.0.5')
       expect(config.devDependencies).toHaveProperty('@tailwindcss/vite', '^4.1.16')

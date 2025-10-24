@@ -50,7 +50,7 @@ describe('variants.ts', () => {
       expect(variant?.dependencies).toHaveProperty('tailwindcss', '^4.1.16')
       expect(variant?.dependencies).toHaveProperty('class-variance-authority', '^0.7.1')
       expect(variant?.dependencies).toHaveProperty('clsx', '^2.1.1')
-      expect(variant?.dependencies).toHaveProperty('tailwind-merge', '^2.7.0')
+      expect(variant?.dependencies).toHaveProperty('tailwind-merge', '^3.3.1')
       expect(variant?.dependencies).toHaveProperty('lucide-react', '^0.468.0')
       expect(variant?.dependencies).toHaveProperty('tw-animate-css', '^1.0.5')
       expect(variant?.devDependencies).toHaveProperty('@tailwindcss/vite', '^4.1.16')

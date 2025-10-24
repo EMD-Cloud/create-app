@@ -59,7 +59,7 @@ const FRAMEWORKS: Framework[] = [
   },
   {
     name: 'nextjs',
-    display: 'Next.js 15',
+    display: 'Next.js 16',
     color: cyan,
     variants: [
       {

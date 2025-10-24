@@ -68,7 +68,7 @@ export function getStyleVariant(
           'tailwindcss': '^4.1.16',
           'class-variance-authority': '^0.7.1',
           'clsx': '^2.1.1',
-          'tailwind-merge': '^2.7.0',
+          'tailwind-merge': '^3.3.1',
           'lucide-react': '^0.468.0',
           'tw-animate-css': '^1.0.5',
         },

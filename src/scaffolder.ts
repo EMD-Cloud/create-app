@@ -83,7 +83,7 @@ export async function getPackageJsonConfig(inputs: UserInputs): Promise<Template
     config.dependencies['tailwindcss'] = '^4.1.16'
     config.dependencies['class-variance-authority'] = '^0.7.1'
     config.dependencies['clsx'] = '^2.1.1'
-    config.dependencies['tailwind-merge'] = '^2.7.0'
+    config.dependencies['tailwind-merge'] = '^3.3.1'
     config.dependencies['lucide-react'] = '^0.468.0'
     config.dependencies['tw-animate-css'] = '^1.0.5'
     // Next.js uses PostCSS, Vite uses the Vite plugin
