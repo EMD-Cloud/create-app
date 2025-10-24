@@ -188,78 +188,75 @@ describe('scaffolder file system operations', () => {
   })
 
   describe('createEslintConfig', () => {
-    it('should create Standard ESLint config', async () => {
-      vi.mocked(fs.writeJson).mockResolvedValue(undefined)
+    it('should create Standard ESLint flat config', async () => {
+      vi.mocked(fs.writeFile).mockResolvedValue(undefined as any)
 
       const inputs = createMockInputs({ eslintPreset: 'standard', variant: 'react' })
 
       await createEslintConfig('/test/dir', inputs)
 
-      expect(fs.writeJson).toHaveBeenCalledWith(
-        '/test/dir/.eslintrc.json',
-        expect.objectContaining({
-          env: {
-            browser: true,
-            es2021: true,
-          },
-          extends: expect.arrayContaining(['eslint:recommended', 'standard']),
-        }),
-        { spaces: 2 }
+      expect(fs.writeFile).toHaveBeenCalledWith(
+        '/test/dir/eslint.config.js',
+        expect.stringContaining('import standard from'),
+        'utf-8'
       )
+
+      const configContent = vi.mocked(fs.writeFile).mock.calls[0][1] as string
+      expect(configContent).toContain('import js from')
+      expect(configContent).toContain('import reactPlugin from')
+      expect(configContent).toContain('export default [')
     })
 
-    it('should create Airbnb ESLint config', async () => {
-      vi.mocked(fs.writeJson).mockResolvedValue(undefined)
+    it('should create Airbnb ESLint flat config', async () => {
+      vi.mocked(fs.writeFile).mockResolvedValue(undefined as any)
 
       const inputs = createMockInputs({ eslintPreset: 'airbnb', variant: 'react' })
 
       await createEslintConfig('/test/dir', inputs)
 
-      expect(fs.writeJson).toHaveBeenCalledWith(
-        '/test/dir/.eslintrc.json',
-        expect.objectContaining({
-          extends: expect.arrayContaining(['eslint:recommended', 'airbnb', 'airbnb/hooks']),
-        }),
-        { spaces: 2 }
-      )
+      const configContent = vi.mocked(fs.writeFile).mock.calls[0][1] as string
+      expect(configContent).toContain('import airbnb from')
+      expect(configContent).toContain('import airbnbHooks from')
+      expect(configContent).toContain('airbnb,')
+      expect(configContent).toContain('airbnbHooks,')
     })
 
-    it('should include TypeScript parser for TS variants', async () => {
-      vi.mocked(fs.writeJson).mockResolvedValue(undefined)
+    it('should include TypeScript imports for TS variants', async () => {
+      vi.mocked(fs.writeFile).mockResolvedValue(undefined as any)
 
       const inputs = createMockInputs({ eslintPreset: 'standard', variant: 'react-ts' })
 
       await createEslintConfig('/test/dir', inputs)
 
-      const config = vi.mocked(fs.writeJson).mock.calls[0][1] as any
-
-      expect(config.extends).toContain('plugin:@typescript-eslint/recommended')
-      expect(config.parserOptions.parser).toBe('@typescript-eslint/parser')
+      const configContent = vi.mocked(fs.writeFile).mock.calls[0][1] as string
+      expect(configContent).toContain('import tseslint from')
+      expect(configContent).toContain('import tsParser from')
+      expect(configContent).toContain('parser: tsParser')
     })
 
-    it('should NOT include TypeScript parser for JS variants', async () => {
-      vi.mocked(fs.writeJson).mockResolvedValue(undefined)
+    it('should NOT include TypeScript imports for JS variants', async () => {
+      vi.mocked(fs.writeFile).mockResolvedValue(undefined as any)
 
       const inputs = createMockInputs({ eslintPreset: 'standard', variant: 'react' })
 
       await createEslintConfig('/test/dir', inputs)
 
-      const config = vi.mocked(fs.writeJson).mock.calls[0][1] as any
-
-      expect(config.extends).not.toContain('plugin:@typescript-eslint/recommended')
-      expect(config.parserOptions).not.toHaveProperty('parser')
+      const configContent = vi.mocked(fs.writeFile).mock.calls[0][1] as string
+      expect(configContent).not.toContain('import tseslint from')
+      expect(configContent).not.toContain('import tsParser from')
     })
 
-    it('should create minimal config for none preset', async () => {
-      vi.mocked(fs.writeJson).mockResolvedValue(undefined)
+    it('should create config without preset imports for none preset', async () => {
+      vi.mocked(fs.writeFile).mockResolvedValue(undefined as any)
 
       const inputs = createMockInputs({ eslintPreset: 'none', variant: 'react' })
 
       await createEslintConfig('/test/dir', inputs)
 
-      const config = vi.mocked(fs.writeJson).mock.calls[0][1] as any
-
-      expect(config.extends).toEqual(['eslint:recommended'])
+      const configContent = vi.mocked(fs.writeFile).mock.calls[0][1] as string
+      expect(configContent).not.toContain('import airbnb from')
+      expect(configContent).not.toContain('import standard from')
+      expect(configContent).toContain('js.configs.recommended')
     })
   })
 

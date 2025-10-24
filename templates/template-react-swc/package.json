@@ -9,14 +9,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emd-cloud/react-components": "^1.13.6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@emd-cloud/react-components": "^1.14.0",
+    "@emd-cloud/sdk": "^1.11.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tus-js-client": "^4.3.1",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.37",
-    "@types/react-dom": "^18.2.15",
-    "@vitejs/plugin-react-swc": "^3.5.0",
-    "vite": "^5.0.8"
+    "@types/react": "^19.0.6",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react-swc": "^3.9.1",
+    "vite": "^7.0.3"
   }
 }

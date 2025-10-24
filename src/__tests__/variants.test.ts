@@ -9,51 +9,74 @@ import type { UserInputs } from '../prompts.js'
 describe('variants.ts', () => {
   describe('getStyleVariant', () => {
     it('should return null for vanilla CSS', () => {
-      expect(getStyleVariant('vanilla', false)).toBeNull()
-      expect(getStyleVariant('vanilla', true)).toBeNull()
+      expect(getStyleVariant('vanilla', false, 'react')).toBeNull()
+      expect(getStyleVariant('vanilla', true, 'react')).toBeNull()
     })
 
     it('should return SCSS variant with correct dependencies', () => {
-      const variant = getStyleVariant('scss', false)
+      const variant = getStyleVariant('scss', false, 'react')
 
       expect(variant).not.toBeNull()
       expect(variant?.name).toBe('scss')
-      expect(variant?.devDependencies).toHaveProperty('sass', '^1.69.5')
+      expect(variant?.devDependencies).toHaveProperty('sass', '^1.87.0')
     })
 
-    it('should return Tailwind variant with correct dependencies', () => {
-      const variant = getStyleVariant('tailwind', false)
+    it('should return Tailwind variant with Vite plugin for React', () => {
+      const variant = getStyleVariant('tailwind', false, 'react')
 
       expect(variant).not.toBeNull()
       expect(variant?.name).toBe('tailwind')
-      expect(variant?.dependencies).toHaveProperty('tailwindcss', '^3.3.6')
-      expect(variant?.devDependencies).toHaveProperty('postcss', '^8.4.31')
-      expect(variant?.devDependencies).toHaveProperty('autoprefixer', '^10.4.16')
+      expect(variant?.dependencies).toHaveProperty('tailwindcss', '^4.1.16')
+      expect(variant?.devDependencies).toHaveProperty('@tailwindcss/vite', '^4.1.16')
+      expect(variant?.devDependencies).not.toHaveProperty('postcss')
     })
 
-    it('should return shadcn variant for TypeScript projects', () => {
-      const variant = getStyleVariant('shadcn', true)
+    it('should return Tailwind variant with PostCSS for Next.js', () => {
+      const variant = getStyleVariant('tailwind', false, 'nextjs')
+
+      expect(variant).not.toBeNull()
+      expect(variant?.name).toBe('tailwind')
+      expect(variant?.dependencies).toHaveProperty('tailwindcss', '^4.1.16')
+      expect(variant?.devDependencies).toHaveProperty('@tailwindcss/postcss', '^4.1.16')
+      expect(variant?.devDependencies).toHaveProperty('postcss', '^8.4.51')
+      expect(variant?.devDependencies).not.toHaveProperty('@tailwindcss/vite')
+    })
+
+    it('should return shadcn variant with Vite plugin for React TypeScript', () => {
+      const variant = getStyleVariant('shadcn', true, 'react')
 
       expect(variant).not.toBeNull()
       expect(variant?.name).toBe('shadcn')
-      expect(variant?.dependencies).toHaveProperty('class-variance-authority', '^0.7.0')
-      expect(variant?.dependencies).toHaveProperty('clsx', '^2.0.0')
-      expect(variant?.dependencies).toHaveProperty('tailwind-merge', '^2.0.0')
-      expect(variant?.dependencies).toHaveProperty('lucide-react', '^0.294.0')
-      expect(variant?.devDependencies).toHaveProperty('tailwindcss', '^3.3.6')
-      expect(variant?.devDependencies).toHaveProperty('postcss', '^8.4.31')
-      expect(variant?.devDependencies).toHaveProperty('autoprefixer', '^10.4.16')
+      expect(variant?.dependencies).toHaveProperty('tailwindcss', '^4.1.16')
+      expect(variant?.dependencies).toHaveProperty('class-variance-authority', '^0.7.1')
+      expect(variant?.dependencies).toHaveProperty('clsx', '^2.1.1')
+      expect(variant?.dependencies).toHaveProperty('tailwind-merge', '^2.7.0')
+      expect(variant?.dependencies).toHaveProperty('lucide-react', '^0.468.0')
+      expect(variant?.dependencies).toHaveProperty('tw-animate-css', '^1.0.5')
+      expect(variant?.devDependencies).toHaveProperty('@tailwindcss/vite', '^4.1.16')
+      expect(variant?.devDependencies).not.toHaveProperty('postcss')
+    })
+
+    it('should return shadcn variant with PostCSS for Next.js TypeScript', () => {
+      const variant = getStyleVariant('shadcn', true, 'nextjs')
+
+      expect(variant).not.toBeNull()
+      expect(variant?.name).toBe('shadcn')
+      expect(variant?.dependencies).toHaveProperty('tailwindcss', '^4.1.16')
+      expect(variant?.devDependencies).toHaveProperty('@tailwindcss/postcss', '^4.1.16')
+      expect(variant?.devDependencies).toHaveProperty('postcss', '^8.4.51')
+      expect(variant?.devDependencies).not.toHaveProperty('@tailwindcss/vite')
     })
 
     it('should return null for shadcn with JavaScript projects', () => {
-      const variant = getStyleVariant('shadcn', false)
+      const variant = getStyleVariant('shadcn', false, 'react')
 
       expect(variant).toBeNull()
     })
 
     it('should return null for unknown style', () => {
-      expect(getStyleVariant('unknown', false)).toBeNull()
-      expect(getStyleVariant('unknown', true)).toBeNull()
+      expect(getStyleVariant('unknown', false, 'react')).toBeNull()
+      expect(getStyleVariant('unknown', true, 'react')).toBeNull()
     })
   })
 
@@ -68,8 +91,8 @@ describe('variants.ts', () => {
 
         expect(variant).not.toBeNull()
         expect(variant?.name).toBe('redux')
-        expect(variant?.dependencies).toHaveProperty('@reduxjs/toolkit', '^1.9.7')
-        expect(variant?.dependencies).toHaveProperty('react-redux', '^8.1.3')
+        expect(variant?.dependencies).toHaveProperty('@reduxjs/toolkit', '^2.9.2')
+        expect(variant?.dependencies).toHaveProperty('react-redux', '^9.2.0')
       })
 
       it('should return Effector variant with correct dependencies', () => {
@@ -77,8 +100,8 @@ describe('variants.ts', () => {
 
         expect(variant).not.toBeNull()
         expect(variant?.name).toBe('effector')
-        expect(variant?.dependencies).toHaveProperty('effector', '^23.2.0')
-        expect(variant?.dependencies).toHaveProperty('effector-react', '^23.2.0')
+        expect(variant?.dependencies).toHaveProperty('effector', '^24.0.0')
+        expect(variant?.dependencies).toHaveProperty('effector-react', '^24.0.0')
       })
 
       it('should return TanStack Query variant with correct dependencies', () => {
@@ -86,7 +109,7 @@ describe('variants.ts', () => {
 
         expect(variant).not.toBeNull()
         expect(variant?.name).toBe('tanstack-query')
-        expect(variant?.dependencies).toHaveProperty('@tanstack/react-query', '^5.28.0')
+        expect(variant?.dependencies).toHaveProperty('@tanstack/react-query', '^5.90.5')
       })
     })
 

@@ -32,8 +32,7 @@ describe('scaffolder integration', () => {
 
       // Verify Tailwind CSS dependencies
       expect(config.dependencies).toHaveProperty('tailwindcss')
-      expect(config.devDependencies).toHaveProperty('postcss')
-      expect(config.devDependencies).toHaveProperty('autoprefixer')
+      expect(config.devDependencies).toHaveProperty('@tailwindcss/vite')
 
       // Verify Redux dependencies
       expect(config.dependencies).toHaveProperty('@reduxjs/toolkit')
@@ -93,6 +92,45 @@ describe('scaffolder integration', () => {
 
       // Verify ESLint
       expect(config.devDependencies).toHaveProperty('eslint')
+    })
+
+    it('should use PostCSS for Next.js + Tailwind (not Vite plugin)', async () => {
+      const inputs = createMockInputs({
+        framework: 'nextjs',
+        variant: 'nextjs-ts',
+        style: 'tailwind',
+        stateManagement: 'none',
+        eslintPreset: 'none',
+      })
+
+      const config = await getPackageJsonConfig(inputs)
+
+      // Next.js should use PostCSS approach
+      expect(config.dependencies).toHaveProperty('tailwindcss', '^4.1.16')
+      expect(config.devDependencies).toHaveProperty('@tailwindcss/postcss', '^4.1.16')
+      expect(config.devDependencies).toHaveProperty('postcss', '^8.4.51')
+      // Should NOT have Vite plugin
+      expect(config.devDependencies).not.toHaveProperty('@tailwindcss/vite')
+    })
+
+    it('should use PostCSS for Next.js + shadcn (not Vite plugin)', async () => {
+      const inputs = createMockInputs({
+        framework: 'nextjs',
+        variant: 'nextjs-ts',
+        style: 'shadcn',
+        stateManagement: 'none',
+        eslintPreset: 'none',
+      })
+
+      const config = await getPackageJsonConfig(inputs)
+
+      // Next.js should use PostCSS approach
+      expect(config.dependencies).toHaveProperty('tailwindcss', '^4.1.16')
+      expect(config.dependencies).toHaveProperty('tw-animate-css', '^1.0.5')
+      expect(config.devDependencies).toHaveProperty('@tailwindcss/postcss', '^4.1.16')
+      expect(config.devDependencies).toHaveProperty('postcss', '^8.4.51')
+      // Should NOT have Vite plugin
+      expect(config.devDependencies).not.toHaveProperty('@tailwindcss/vite')
     })
   })
 

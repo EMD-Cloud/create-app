@@ -63,57 +63,77 @@ export async function getPackageJsonConfig(inputs: UserInputs): Promise<Template
     devDependencies: {},
   }
 
-  // @emd-cloud/sdk is a peer dependency of @emd-cloud/react-components
-  // It will be installed automatically by package managers
+  // Note: @emd-cloud/sdk, tus-js-client, and uuid are explicitly installed
+  // in all templates as dependencies alongside @emd-cloud/react-components
+  // to ensure consistent versions across all package managers
 
   // Add style dependencies
   if (inputs.style === 'scss') {
-    config.devDependencies['sass'] = '^1.69.5'
+    config.devDependencies['sass'] = '^1.87.0'
   } else if (inputs.style === 'tailwind') {
-    config.dependencies['tailwindcss'] = '^3.3.6'
-    config.devDependencies['postcss'] = '^8.4.31'
-    config.devDependencies['autoprefixer'] = '^10.4.16'
+    config.dependencies['tailwindcss'] = '^4.1.16'
+    // Next.js uses PostCSS, Vite uses the Vite plugin
+    if (inputs.framework === 'nextjs') {
+      config.devDependencies['@tailwindcss/postcss'] = '^4.1.16'
+      config.devDependencies['postcss'] = '^8.4.51'
+    } else {
+      config.devDependencies['@tailwindcss/vite'] = '^4.1.16'
+    }
   } else if (inputs.style === 'shadcn') {
-    config.dependencies['tailwindcss'] = '^3.3.6'
-    config.dependencies['class-variance-authority'] = '^0.7.0'
-    config.dependencies['clsx'] = '^2.0.0'
-    config.dependencies['tailwind-merge'] = '^2.0.0'
-    config.dependencies['lucide-react'] = '^0.294.0'
-    config.devDependencies['postcss'] = '^8.4.31'
-    config.devDependencies['autoprefixer'] = '^10.4.16'
+    config.dependencies['tailwindcss'] = '^4.1.16'
+    config.dependencies['class-variance-authority'] = '^0.7.1'
+    config.dependencies['clsx'] = '^2.1.1'
+    config.dependencies['tailwind-merge'] = '^2.7.0'
+    config.dependencies['lucide-react'] = '^0.468.0'
+    config.dependencies['tw-animate-css'] = '^1.0.5'
+    // Next.js uses PostCSS, Vite uses the Vite plugin
+    if (inputs.framework === 'nextjs') {
+      config.devDependencies['@tailwindcss/postcss'] = '^4.1.16'
+      config.devDependencies['postcss'] = '^8.4.51'
+    } else {
+      config.devDependencies['@tailwindcss/vite'] = '^4.1.16'
+    }
   }
 
   // Add state management dependencies
   if (inputs.stateManagement === 'redux') {
-    config.dependencies['@reduxjs/toolkit'] = '^1.9.7'
-    config.dependencies['react-redux'] = '^8.1.3'
+    config.dependencies['@reduxjs/toolkit'] = '^2.9.2'
+    config.dependencies['react-redux'] = '^9.2.0'
   } else if (inputs.stateManagement === 'effector') {
-    config.dependencies['effector'] = '^23.2.0'
-    config.dependencies['effector-react'] = '^23.2.0'
+    config.dependencies['effector'] = '^24.0.0'
+    config.dependencies['effector-react'] = '^24.0.0'
   } else if (inputs.stateManagement === 'tanstack-query') {
-    config.dependencies['@tanstack/react-query'] = '^5.28.0'
+    config.dependencies['@tanstack/react-query'] = '^5.90.5'
   }
 
   // Add ESLint dependencies
   if (inputs.eslintPreset !== 'none') {
-    config.devDependencies['eslint'] = '^8.55.0'
-    config.devDependencies['eslint-plugin-react'] = '^7.33.2'
-    config.devDependencies['eslint-plugin-react-hooks'] = '^4.6.0'
+    config.devDependencies['eslint'] = '^9.17.0'
+    config.devDependencies['@eslint/js'] = '^9.17.0'
+    config.devDependencies['eslint-plugin-react'] = '^7.37.5'
+    config.devDependencies['eslint-plugin-react-hooks'] = '^5.1.0'
 
     if (inputs.eslintPreset === 'airbnb') {
       config.devDependencies['eslint-config-airbnb'] = '^19.0.4'
       config.devDependencies['eslint-plugin-import'] = '^2.29.0'
-      config.devDependencies['eslint-plugin-jsx-a11y'] = '^6.8.0'
+      config.devDependencies['eslint-plugin-jsx-a11y'] = '^6.10.2'
     } else if (inputs.eslintPreset === 'standard') {
       config.devDependencies['eslint-config-standard'] = '^17.1.0'
-      config.devDependencies['eslint-plugin-import'] = '^2.29.0'
-      config.devDependencies['eslint-plugin-n'] = '^16.6.2'
-      config.devDependencies['eslint-plugin-promise'] = '^6.1.1'
+      config.devDependencies['eslint-plugin-import'] = '^2.31.0'
+      config.devDependencies['eslint-plugin-n'] = '^17.15.1'
+      config.devDependencies['eslint-plugin-promise'] = '^7.2.1'
+    }
+
+    // Add TypeScript ESLint support for TypeScript variants
+    const isTypeScript = inputs.variant.includes('-ts')
+    if (isTypeScript) {
+      config.devDependencies['@typescript-eslint/eslint-plugin'] = '^8.20.0'
+      config.devDependencies['@typescript-eslint/parser'] = '^8.20.0'
     }
   }
 
   // Add prettier
-  config.devDependencies['prettier'] = '^3.1.1'
+  config.devDependencies['prettier'] = '^3.6.2'
 
   return config
 }
@@ -331,6 +351,11 @@ export async function scaffoldProject(inputs: UserInputs): Promise<void> {
     if (inputs.style === 'shadcn') {
       await setupShadcnPaths(targetDir)
     }
+
+    // Create PostCSS config for Next.js with Tailwind/shadcn
+    if (inputs.framework === 'nextjs' && (inputs.style === 'tailwind' || inputs.style === 'shadcn')) {
+      await createPostCSSConfig(targetDir)
+    }
   }
 
   // Add ESLint and Prettier configs if needed
@@ -352,31 +377,77 @@ export async function createEslintConfig(
 ): Promise<void> {
   const isTypeScript = inputs.variant.includes('-ts')
 
-  const eslintConfig = {
-    env: {
-      browser: true,
-      es2021: true,
-    },
-    extends: [
-      'eslint:recommended',
-      ...(inputs.eslintPreset === 'airbnb'
-        ? ['airbnb', 'airbnb/hooks']
-        : inputs.eslintPreset === 'standard'
-          ? ['standard']
-          : []),
-      ...(isTypeScript ? ['plugin:@typescript-eslint/recommended'] : []),
-    ],
-    parserOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      ...(isTypeScript ? { parser: '@typescript-eslint/parser' } : {}),
-    },
-    rules: {},
+  // Generate ESLint flat config (eslint.config.js)
+  let configContent = `import js from '@eslint/js'\n`
+
+  // Add imports based on preset
+  if (inputs.eslintPreset === 'airbnb') {
+    configContent += `import airbnb from 'eslint-config-airbnb'\n`
+    configContent += `import airbnbHooks from 'eslint-config-airbnb/hooks'\n`
+  } else if (inputs.eslintPreset === 'standard') {
+    configContent += `import standard from 'eslint-config-standard'\n`
   }
 
-  await fs.writeJson(path.join(projectDir, '.eslintrc.json'), eslintConfig, {
-    spaces: 2,
-  })
+  configContent += `import reactPlugin from 'eslint-plugin-react'\n`
+  configContent += `import reactHooksPlugin from 'eslint-plugin-react-hooks'\n`
+
+  if (isTypeScript) {
+    configContent += `import tseslint from '@typescript-eslint/eslint-plugin'\n`
+    configContent += `import tsParser from '@typescript-eslint/parser'\n`
+  }
+
+  configContent += `\nexport default [\n`
+  configContent += `  js.configs.recommended,\n`
+
+  // Add preset config
+  if (inputs.eslintPreset === 'airbnb') {
+    configContent += `  airbnb,\n`
+    configContent += `  airbnbHooks,\n`
+  } else if (inputs.eslintPreset === 'standard') {
+    configContent += `  standard,\n`
+  }
+
+  // Main config object
+  configContent += `  {\n`
+  configContent += `    files: ['**/*.{js,jsx${isTypeScript ? ',ts,tsx' : ''}}'],\n`
+  configContent += `    languageOptions: {\n`
+  configContent += `      ecmaVersion: 'latest',\n`
+  configContent += `      sourceType: 'module',\n`
+  configContent += `      globals: {\n`
+  configContent += `        browser: true,\n`
+  configContent += `        es2021: true,\n`
+  configContent += `      },\n`
+
+  if (isTypeScript) {
+    configContent += `      parser: tsParser,\n`
+    configContent += `      parserOptions: {\n`
+    configContent += `        ecmaFeatures: { jsx: true },\n`
+    configContent += `      },\n`
+  }
+
+  configContent += `    },\n`
+  configContent += `    plugins: {\n`
+  configContent += `      react: reactPlugin,\n`
+  configContent += `      'react-hooks': reactHooksPlugin,\n`
+
+  if (isTypeScript) {
+    configContent += `      '@typescript-eslint': tseslint,\n`
+  }
+
+  configContent += `    },\n`
+  configContent += `    rules: {\n`
+  configContent += `      ...reactPlugin.configs.recommended.rules,\n`
+  configContent += `      ...reactHooksPlugin.configs.recommended.rules,\n`
+
+  if (isTypeScript) {
+    configContent += `      ...tseslint.configs.recommended.rules,\n`
+  }
+
+  configContent += `    },\n`
+  configContent += `  },\n`
+  configContent += `]\n`
+
+  await fs.writeFile(path.join(projectDir, 'eslint.config.js'), configContent, 'utf-8')
 }
 
 export async function createPrettierConfig(projectDir: string): Promise<void> {
@@ -391,4 +462,16 @@ export async function createPrettierConfig(projectDir: string): Promise<void> {
   await fs.writeJson(path.join(projectDir, '.prettierrc.json'), prettierConfig, {
     spaces: 2,
   })
+}
+
+export async function createPostCSSConfig(projectDir: string): Promise<void> {
+  const configContent = `const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+export default config;
+`
+
+  await fs.writeFile(path.join(projectDir, 'postcss.config.mjs'), configContent, 'utf-8')
 }

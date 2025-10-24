@@ -193,12 +193,18 @@ const templateName = framework === 'nextjs'
 
 ## All Templates Pre-configure @emd-cloud/react-components
 
-Every generated project includes `@emd-cloud/react-components` (v1.13.6+) in dependencies. This library provides:
+Every generated project includes `@emd-cloud/react-components` (v1.14.0+) in dependencies. This library provides:
 - ApplicationProvider for SDK initialization
 - React hooks: useAuth, useDatabase, useWebhook, useUploader
 - TypeScript types from @emd-cloud/sdk
 
-**@emd-cloud/sdk is a peer dependency** and gets installed automatically.
+**All EMD dependencies are explicitly installed:**
+- `@emd-cloud/react-components`: ^1.14.0
+- `@emd-cloud/sdk`: ^1.11.0 (peer dependency)
+- `tus-js-client`: ^4.3.1 (peer dependency)
+- `uuid`: ^13.0.0 (peer dependency)
+
+Explicitly installing peer dependencies ensures consistent versions across all package managers.
 
 ### Template Integration
 

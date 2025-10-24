@@ -14,7 +14,7 @@ export function getTemplateVariants(inputs: UserInputs): TemplateVariant[] {
   const isTypeScript = inputs.variant.includes('-ts')
 
   // Style variants
-  const styleVariant = getStyleVariant(inputs.style, isTypeScript)
+  const styleVariant = getStyleVariant(inputs.style, isTypeScript, inputs.framework)
   if (styleVariant) {
     variants.push(styleVariant)
   }
@@ -30,14 +30,15 @@ export function getTemplateVariants(inputs: UserInputs): TemplateVariant[] {
 
 export function getStyleVariant(
   style: string,
-  isTypeScript: boolean
+  isTypeScript: boolean,
+  framework: string = 'react'
 ): TemplateVariant | null {
   switch (style) {
     case 'scss':
       return {
         name: 'scss',
         devDependencies: {
-          sass: '^1.69.5',
+          sass: '^1.87.0',
         },
       }
 
@@ -45,12 +46,16 @@ export function getStyleVariant(
       return {
         name: 'tailwind',
         dependencies: {
-          'tailwindcss': '^3.3.6',
+          'tailwindcss': '^4.1.16',
         },
-        devDependencies: {
-          'postcss': '^8.4.31',
-          'autoprefixer': '^10.4.16',
-        },
+        devDependencies: framework === 'nextjs'
+          ? {
+              '@tailwindcss/postcss': '^4.1.16',
+              'postcss': '^8.4.51',
+            }
+          : {
+              '@tailwindcss/vite': '^4.1.16',
+            },
       }
 
     case 'shadcn':
@@ -60,16 +65,21 @@ export function getStyleVariant(
       return {
         name: 'shadcn',
         dependencies: {
-          'class-variance-authority': '^0.7.0',
-          'clsx': '^2.0.0',
-          'tailwind-merge': '^2.0.0',
-          'lucide-react': '^0.294.0',
+          'tailwindcss': '^4.1.16',
+          'class-variance-authority': '^0.7.1',
+          'clsx': '^2.1.1',
+          'tailwind-merge': '^2.7.0',
+          'lucide-react': '^0.468.0',
+          'tw-animate-css': '^1.0.5',
         },
-        devDependencies: {
-          'tailwindcss': '^3.3.6',
-          'postcss': '^8.4.31',
-          'autoprefixer': '^10.4.16',
-        },
+        devDependencies: framework === 'nextjs'
+          ? {
+              '@tailwindcss/postcss': '^4.1.16',
+              'postcss': '^8.4.51',
+            }
+          : {
+              '@tailwindcss/vite': '^4.1.16',
+            },
       }
 
     default:
@@ -91,8 +101,8 @@ export function getStateManagementVariant(
       return {
         name: 'redux',
         dependencies: {
-          '@reduxjs/toolkit': '^1.9.7',
-          'react-redux': '^8.1.3',
+          '@reduxjs/toolkit': '^2.9.2',
+          'react-redux': '^9.2.0',
         },
       }
 
@@ -100,8 +110,8 @@ export function getStateManagementVariant(
       return {
         name: 'effector',
         dependencies: {
-          'effector': '^23.2.0',
-          'effector-react': '^23.2.0',
+          'effector': '^24.0.0',
+          'effector-react': '^24.0.0',
         },
       }
 
@@ -109,7 +119,7 @@ export function getStateManagementVariant(
       return {
         name: 'tanstack-query',
         dependencies: {
-          '@tanstack/react-query': '^5.28.0',
+          '@tanstack/react-query': '^5.90.5',
         },
       }
 

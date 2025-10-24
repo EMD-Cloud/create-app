@@ -228,7 +228,7 @@ describe('scaffolder.ts', () => {
 
       const config = await getPackageJsonConfig(inputs)
 
-      expect(config.devDependencies).toHaveProperty('sass', '^1.69.5')
+      expect(config.devDependencies).toHaveProperty('sass', '^1.87.0')
     })
 
     it('should include Tailwind dependencies', async () => {
@@ -240,9 +240,8 @@ describe('scaffolder.ts', () => {
 
       const config = await getPackageJsonConfig(inputs)
 
-      expect(config.dependencies).toHaveProperty('tailwindcss', '^3.3.6')
-      expect(config.devDependencies).toHaveProperty('postcss', '^8.4.31')
-      expect(config.devDependencies).toHaveProperty('autoprefixer', '^10.4.16')
+      expect(config.dependencies).toHaveProperty('tailwindcss', '^4.1.16')
+      expect(config.devDependencies).toHaveProperty('@tailwindcss/vite', '^4.1.16')
     })
 
     it('should include shadcn dependencies', async () => {
@@ -255,11 +254,13 @@ describe('scaffolder.ts', () => {
 
       const config = await getPackageJsonConfig(inputs)
 
-      expect(config.dependencies).toHaveProperty('tailwindcss', '^3.3.6')
-      expect(config.dependencies).toHaveProperty('class-variance-authority', '^0.7.0')
-      expect(config.dependencies).toHaveProperty('clsx', '^2.0.0')
-      expect(config.dependencies).toHaveProperty('tailwind-merge', '^2.0.0')
-      expect(config.dependencies).toHaveProperty('lucide-react', '^0.294.0')
+      expect(config.dependencies).toHaveProperty('tailwindcss', '^4.1.16')
+      expect(config.dependencies).toHaveProperty('class-variance-authority', '^0.7.1')
+      expect(config.dependencies).toHaveProperty('clsx', '^2.1.1')
+      expect(config.dependencies).toHaveProperty('tailwind-merge', '^2.7.0')
+      expect(config.dependencies).toHaveProperty('lucide-react', '^0.468.0')
+      expect(config.dependencies).toHaveProperty('tw-animate-css', '^1.0.5')
+      expect(config.devDependencies).toHaveProperty('@tailwindcss/vite', '^4.1.16')
     })
 
     it('should include Redux dependencies', async () => {
@@ -271,8 +272,8 @@ describe('scaffolder.ts', () => {
 
       const config = await getPackageJsonConfig(inputs)
 
-      expect(config.dependencies).toHaveProperty('@reduxjs/toolkit', '^1.9.7')
-      expect(config.dependencies).toHaveProperty('react-redux', '^8.1.3')
+      expect(config.dependencies).toHaveProperty('@reduxjs/toolkit', '^2.9.2')
+      expect(config.dependencies).toHaveProperty('react-redux', '^9.2.0')
     })
 
     it('should include Effector dependencies', async () => {
@@ -284,8 +285,8 @@ describe('scaffolder.ts', () => {
 
       const config = await getPackageJsonConfig(inputs)
 
-      expect(config.dependencies).toHaveProperty('effector', '^23.2.0')
-      expect(config.dependencies).toHaveProperty('effector-react', '^23.2.0')
+      expect(config.dependencies).toHaveProperty('effector', '^24.0.0')
+      expect(config.dependencies).toHaveProperty('effector-react', '^24.0.0')
     })
 
     it('should include TanStack Query dependencies', async () => {
@@ -297,7 +298,7 @@ describe('scaffolder.ts', () => {
 
       const config = await getPackageJsonConfig(inputs)
 
-      expect(config.dependencies).toHaveProperty('@tanstack/react-query', '^5.28.0')
+      expect(config.dependencies).toHaveProperty('@tanstack/react-query', '^5.90.5')
     })
 
     it('should include ESLint Standard dependencies', async () => {
