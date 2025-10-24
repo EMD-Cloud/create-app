@@ -1,0 +1,83 @@
+{
+  "name": "@emd-cloud/create-app",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Create EMD Cloud projects with your choice of framework, language, and styling",
+  "author": "Vladislav Pavlik <vpavlik@emd.one>",
+  "license": "MIT",
+  "bin": {
+    "create-emd-app": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "rimraf dist && tsup src/index.ts --minify --sourcemap --format esm --outDir dist -- --shebang",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest --watch=false",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui"
+  },
+  "dependencies": {
+    "@emd-cloud/sdk": "*",
+    "fs-extra": "^11.2.0",
+    "kolorist": "^1.8.0",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.1",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.1",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.10.6",
+    "@types/prompts": "^2.4.9",
+    "@vitest/coverage-v8": "^1.1.0",
+    "@vitest/ui": "^1.1.0",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.0.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.1.0"
+  },
+  "keywords": [
+    "create-app",
+    "emd-cloud",
+    "scaffolder",
+    "cli",
+    "vite",
+    "react",
+    "next.js"
+  ],
+  "bugs": {
+    "url": "https://github.com/EMD-Cloud/sdk/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "repositoryUrl": "https://github.com/EMD-Cloud/create-app.git",
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "message": "chore(release): ${nextRelease.version} \n\n${nextRelease.notes}"
+        }
+      ],
+      "@semantic-release/github"
+    ]
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

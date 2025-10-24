@@ -1,0 +1,60 @@
+// Import partials
+@import './styles/variables';
+@import './styles/mixins';
+
+// Base styles
+:root {
+  font-family: $font-family;
+  line-height: $line-height-base;
+  font-weight: $font-weight-normal;
+  color-scheme: light dark;
+  color: $text-color;
+  background-color: $background-color;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: $font-weight-medium;
+  color: $primary-color;
+  text-decoration: inherit;
+
+  &:hover {
+    color: $primary-hover;
+  }
+}
+
+body {
+  margin: 0;
+  @include flex-center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  @include button-base;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+
+  a {
+    &:hover {
+      color: #747bff;
+    }
+  }
+
+  button {
+    background-color: #f9f9f9;
+  }
+}

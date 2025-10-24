@@ -1,0 +1,102 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6rem 2rem;
+  min-height: 100vh;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.description {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  max-width: $readableWidth;
+  width: 100%;
+  z-index: 2;
+  font-family: ui-monospace, Menlo, Monaco, 'Cascade Code', 'Roboto Mono',
+    Oxygen Mono, Ubuntu Monospace, Source Code Pro, system-ui, sans-serif;
+}
+
+.description p {
+  position: relative;
+  margin: 0;
+  padding: 1rem;
+  background: linear-gradient(
+    to bottom,
+    rgba(102, 126, 234, 0.2),
+    rgba(118, 75, 162, 0.2)
+  );
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 8px;
+  margin-right: 1rem;
+}
+
+.description p:last-child {
+  margin-right: 0;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 4rem 0;
+}
+
+.card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: rgba(102, 126, 234, 0.05);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: rgba(102, 126, 234, 0.4);
+  transform: translateY(-4px);
+}
+
+.card h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.card p {
+  margin: 0.5rem 0;
+}
+
+.card button {
+  margin-top: 1rem;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  border-top: 1px solid rgba(102, 126, 234, 0.2);
+  width: 100%;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 700px) {
+  .description {
+    flex-direction: column;
+  }
+
+  .description p {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  .main {
+    padding: 4rem 1rem;
+  }
+}
