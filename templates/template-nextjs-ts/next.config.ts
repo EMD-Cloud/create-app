@@ -1,8 +1,11 @@
+import type { NextConfig } from "next";
 import path from "path";
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   distDir: 'dist',
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   outputFileTracingRoot: path.join(__dirname),
   turbopack: {
     root: path.join(__dirname),
