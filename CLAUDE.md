@@ -58,13 +58,14 @@ npm unlink -g @emd-cloud/create-app
      - Merges deps into package.json using `deepMerge()`
      - Renames underscore-prefixed files (_gitignore → .gitignore) recursively
      - Updates project name in HTML/JSX files
-   - **Phase 4 (Overlay):** Applies style variant overlays from `templates/variants/{style}/`
-     - Copies configuration files (tailwind.config, postcss.config, etc.)
-     - Overwrites existing files with variant-specific versions
-   - **Phase 5 (Post-process):** Runs style-specific setup functions
-     - `setupShadcnPaths()` - Adds TypeScript path aliases and Vite resolve config
-   - **Phase 6 (Config):** Generates ESLint and Prettier configs if selected
-   - **Phase 7 (Git):** Runs git init/add/commit if requested (fails silently)
+   - **Phase 4 (Overlay):** Applies language and framework-specific style variant overlays
+     - Determines language (js or ts) from variant name
+     - Determines framework type (react vs nextjs)
+     - For React: checks if SWC-specific variant exists (tailwind/shadcn have react-swc variants)
+     - Copies from `templates/variants/{style}/{language}/{framework}/` to project directory
+     - Overwrites existing files with variant-specific versions (CSS, configs, components)
+   - **Phase 5 (Config):** Generates ESLint and Prettier configs if selected
+   - **Phase 6 (Git):** Runs git init/add/commit if requested (fails silently)
 
 4. **Variants** (`src/variants.ts`)
    - Pure functions that return `TemplateVariant` objects
@@ -74,32 +75,53 @@ npm unlink -g @emd-cloud/create-app
 
 ### Template System
 
-**Architecture:** Template overlay system inspired by create-vite
+**Architecture:** Template overlay system with framework-specific style variants
 
 **Base Templates** (`templates/template-{variant}/`):
-- `template-react/` - Vite + React, JavaScript
-- `template-react-ts/` - Vite + React, TypeScript
-- `template-react-swc/` - Vite + React + SWC, JavaScript
-- `template-react-swc-ts/` - Vite + React + SWC, TypeScript
-- `template-nextjs/` - Next.js, JavaScript
-- `template-nextjs-ts/` - Next.js, TypeScript
+- `template-react/` - Vite + React, JavaScript (NO CSS files)
+- `template-react-ts/` - Vite + React, TypeScript (NO CSS files)
+- `template-react-swc/` - Vite + React + SWC, JavaScript (NO CSS files)
+- `template-react-swc-ts/` - Vite + React + SWC, TypeScript (NO CSS files)
+- `template-nextjs/` - Next.js, JavaScript (NO CSS files)
+- `template-nextjs-ts/` - Next.js, TypeScript (NO CSS files)
 
-**Variant Overlays** (`templates/variants/{style}/`):
-- `variants/tailwind/` - Tailwind CSS config, PostCSS, @tailwind directives
-- `variants/shadcn/` - shadcn/ui components, utils, theme CSS variables
-- `variants/scss/` - SCSS variables, mixins, nested styles
+**Style Variant Overlays** (`templates/variants/{style}/{language}/{framework}/`):
+All styling is provided by language and framework-specific variants:
+
+- `variants/vanilla/js/react/` - Plain CSS for React/Vite JS templates
+- `variants/vanilla/js/nextjs/` - Plain CSS for Next.js JS templates
+- `variants/vanilla/ts/react/` - Plain CSS for React/Vite TS templates
+- `variants/vanilla/ts/nextjs/` - Plain CSS for Next.js TS templates
+- `variants/scss/js/react/` - SCSS for React JS (includes App.jsx with .scss imports)
+- `variants/scss/js/nextjs/` - SCSS for Next.js JS (includes layout.js with .scss import)
+- `variants/scss/ts/react/` - SCSS for React TS (includes App.tsx with .scss imports)
+- `variants/scss/ts/nextjs/` - SCSS for Next.js TS (includes layout.tsx with .scss import)
+- `variants/tailwind/js/react/` - Tailwind for React JS (vite.config.js with plugin)
+- `variants/tailwind/js/react-swc/` - Tailwind for React SWC JS (vite.config.js)
+- `variants/tailwind/js/nextjs/` - Tailwind for Next.js JS (postcss.config.mjs)
+- `variants/tailwind/ts/react/` - Tailwind for React TS (vite.config.ts with plugin)
+- `variants/tailwind/ts/react-swc/` - Tailwind for React SWC TS (vite.config.ts)
+- `variants/tailwind/ts/nextjs/` - Tailwind for Next.js TS (postcss.config.mjs)
+- `variants/shadcn/js/react/` - shadcn/ui for React JS (vite.config.js + .jsx components)
+- `variants/shadcn/js/react-swc/` - shadcn/ui for React SWC JS (vite.config.js + .jsx)
+- `variants/shadcn/js/nextjs/` - shadcn/ui for Next.js JS (postcss + .jsx components)
+- `variants/shadcn/ts/react/` - shadcn/ui for React TS (vite.config.ts + .tsx components)
+- `variants/shadcn/ts/react-swc/` - shadcn/ui for React SWC TS (vite.config.ts + .tsx)
+- `variants/shadcn/ts/nextjs/` - shadcn/ui for Next.js TS (postcss + .tsx components)
 
 **How it works:**
-1. Base template copied to target directory
-2. Variant overlay files copied over base (overwrites existing)
-3. Post-processing functions adjust configs (tsconfig paths, vite aliases)
+1. Base template copied to target directory (no styling files)
+2. Language determined from variant name (contains '-ts' → TypeScript, else JavaScript)
+3. Language and framework-specific variant overlay copied over base (provides all styling)
+4. Variant includes CSS/SCSS files, config files (.js or .ts), and code files (.jsx or .tsx)
+5. All configs are static files in variants (no dynamic generation)
 
-**Each template must include:**
+**Each base template must include:**
 - `package.json` (base deps only, variants add more)
-- Framework config file (vite.config.js/ts, next.config.js, tsconfig.json for TS)
-- Entry files (src/main.jsx/tsx for Vite, app/layout/page.jsx/tsx for Next)
+- Framework config file (minimal vite.config, next.config, tsconfig)
+- Entry files with CSS imports (src/main.jsx/tsx, app/layout.js/tsx)
 - `_gitignore` (underscore prefix gets renamed to .gitignore)
-- Basic styling files
+- NO CSS files (variants provide them)
 
 **Template path resolution:**
 ```typescript
@@ -172,6 +194,24 @@ const templateName = framework === 'nextjs'
 
 3. Add variant in `src/variants.ts` `getStyleVariant()` function with dependencies
 
+4. Create language and framework-specific variant directories:
+   ```bash
+   mkdir -p templates/variants/{style-name}/js/react
+   mkdir -p templates/variants/{style-name}/js/nextjs
+   mkdir -p templates/variants/{style-name}/ts/react
+   mkdir -p templates/variants/{style-name}/ts/nextjs
+   # If needed for SWC:
+   mkdir -p templates/variants/{style-name}/js/react-swc
+   mkdir -p templates/variants/{style-name}/ts/react-swc
+   ```
+
+5. Add all necessary files to each variant directory:
+   - CSS/SCSS files (src/App.css, src/index.css for React; src/app/globals.css for Next.js)
+   - Config files with correct extension (vite.config.js for JS, vite.config.ts for TS)
+   - Code files with correct extension (.jsx/.js for JS variants, .tsx/.ts for TS variants)
+   - App/main/layout files if imports need to change (e.g., .scss instead of .css)
+   - Components (for shadcn) or utility files as needed
+
 ### Adding a State Management Option
 
 1. Add to `STATE_MANAGEMENT` array in `src/prompts.ts`
@@ -188,7 +228,13 @@ const templateName = framework === 'nextjs'
 - **ESM imports with .js extension:** TypeScript files import other TypeScript modules with `.js` extension (`import { ... } from './file.js'`). This is required for ESM modules.
 - **Templates included in npm package:** Both `dist/` and `templates/` directories are in `files` array of package.json
 - **Shebang handling:** tsup automatically adds `#!/usr/bin/env node` to dist/index.js when using `--shebang` flag
-- **No separate variant merging:** While `variants.ts` exists for future expansion, variants aren't actively merged in current code—all dependencies are added in `getPackageJsonConfig()`
+- **All styling through variants:** Base templates contain NO CSS files. All styling (including vanilla CSS) comes from language and framework-specific variant overlays.
+- **Language-based variant selection:** Scaffolder determines language (js/ts) from variant name and selects appropriate variant subdirectory.
+- **Framework-specific variants:** Scaffolder automatically selects the correct variant subdirectory (react/nextjs/react-swc) based on user selections.
+- **No file pollution:** JS projects only get .jsx/.js files, TS projects only get .tsx/.ts files.
+- **Static config files:** All configuration files (vite.config.js/ts, postcss.config, etc.) are static files in variants, not dynamically generated.
+- **Path aliases pre-configured:** TypeScript templates already include path aliases (`@/*` → `./src/*`) in tsconfig, no dynamic modification needed.
+- **shadcn supports JavaScript:** shadcn/ui is now available for both JavaScript and TypeScript projects.
 - **Silent failures:** Git initialization and file operations catch and ignore errors to avoid blocking project creation
 
 ## All Templates Pre-configure @emd-cloud/react-components

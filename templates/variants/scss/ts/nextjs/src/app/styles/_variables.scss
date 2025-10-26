@@ -1,0 +1,37 @@
+// Colors
+$primary-color: #646cff;
+$primary-hover: #535bf2;
+$secondary-color: #213547;
+$background-color: #242424;
+$text-color: rgba(255, 255, 255, 0.87);
+$border-color: #646cff;
+
+// Spacing
+$spacing-xs: 0.5rem;
+$spacing-sm: 1rem;
+$spacing-md: 1.5rem;
+$spacing-lg: 2rem;
+$spacing-xl: 3rem;
+
+// Typography
+$font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+$font-size-base: 16px;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$line-height-base: 1.5;
+
+// Border radius
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+
+// Transitions
+$transition-fast: 0.15s;
+$transition-base: 0.25s;
+$transition-slow: 0.35s;
+
+// Breakpoints
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;

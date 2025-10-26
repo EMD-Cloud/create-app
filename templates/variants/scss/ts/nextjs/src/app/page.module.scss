@@ -1,0 +1,97 @@
+@import './styles/variables';
+@import './styles/mixins';
+
+.main {
+  @include flex-column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6rem 2rem;
+  min-height: 100vh;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.description {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  max-width: $readableWidth;
+  width: 100%;
+  z-index: 2;
+  font-family: ui-monospace, Menlo, Monaco, 'Cascade Code', 'Roboto Mono',
+    Oxygen Mono, Ubuntu Monospace, Source Code Pro, system-ui, sans-serif;
+
+  p {
+    position: relative;
+    margin: 0;
+    padding: $spacing-sm;
+    background: linear-gradient(
+      to bottom,
+      rgba(102, 126, 234, 0.2),
+      rgba(118, 75, 162, 0.2)
+    );
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: $border-radius;
+    margin-right: $spacing-sm;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.center {
+  @include flex-center;
+  position: relative;
+  padding: 4rem 0;
+}
+
+.card {
+  @include card;
+  padding: $spacing-md;
+  text-align: center;
+
+  &:hover {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.4);
+    transform: translateY(-4px);
+  }
+
+  h2 {
+    margin: 0 0 $spacing-sm 0;
+    font-size: 1.5rem;
+  }
+
+  p {
+    margin: 0.5rem 0;
+  }
+
+  button {
+    margin-top: $spacing-sm;
+  }
+}
+
+.footer {
+  @include flex-center;
+  padding: $spacing-md;
+  border-top: 1px solid rgba(102, 126, 234, 0.2);
+  width: 100%;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 700px) {
+  .description {
+    flex-direction: column;
+
+    p {
+      margin-right: 0;
+      margin-bottom: $spacing-sm;
+    }
+  }
+
+  .main {
+    padding: 4rem 1rem;
+  }
+}

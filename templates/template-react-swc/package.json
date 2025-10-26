@@ -17,8 +17,6 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@types/react": "^19.0.6",
-    "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react-swc": "^3.9.1",
     "vite": "^7.0.3"
   }

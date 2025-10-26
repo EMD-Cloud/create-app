@@ -228,83 +228,6 @@ export async function applyVariantOverlay(
   await fs.copy(variantPath, projectDir, { overwrite: true })
 }
 
-export async function setupShadcnPaths(projectDir: string): Promise<void> {
-  // Update tsconfig.json to add path aliases for shadcn
-  const tsconfigPath = path.join(projectDir, 'tsconfig.json')
-
-  if (!(await fs.pathExists(tsconfigPath))) {
-    return
-  }
-
-  // Read as text to preserve comments and formatting
-  let tsconfigText = await fs.readFile(tsconfigPath, 'utf-8')
-
-  // Parse JSON (strip comments for parsing, but we'll modify the original text)
-  const tsconfigContent = tsconfigText.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '')
-  const tsconfig = JSON.parse(tsconfigContent)
-
-  // Check if we need to add baseUrl and paths
-  const needsBaseUrl = !tsconfig.compilerOptions?.baseUrl
-  const needsPaths = !tsconfig.compilerOptions?.paths
-
-  if (needsBaseUrl || needsPaths) {
-    // Find the compilerOptions closing brace
-    const compilerOptionsMatch = tsconfigText.match(/"compilerOptions":\s*{/)
-    if (compilerOptionsMatch) {
-      // Find the end of compilerOptions
-      let braceCount = 0
-      let startIndex = compilerOptionsMatch.index! + compilerOptionsMatch[0].length
-      let endIndex = startIndex
-
-      for (let i = startIndex; i < tsconfigText.length; i++) {
-        if (tsconfigText[i] === '{') braceCount++
-        if (tsconfigText[i] === '}') {
-          if (braceCount === 0) {
-            endIndex = i
-            break
-          }
-          braceCount--
-        }
-      }
-
-      // Add baseUrl and paths before the closing brace
-      const pathsConfig = `,\n    "baseUrl": ".",\n    "paths": {\n      "@/*": ["./src/*"]\n    }`
-      tsconfigText = tsconfigText.slice(0, endIndex) + pathsConfig + tsconfigText.slice(endIndex)
-    }
-
-    await fs.writeFile(tsconfigPath, tsconfigText, 'utf-8')
-  }
-
-  // Update vite.config.ts to add path resolution
-  const viteConfigPath = path.join(projectDir, 'vite.config.ts')
-
-  if (await fs.pathExists(viteConfigPath)) {
-    let viteConfig = await fs.readFile(viteConfigPath, 'utf-8')
-
-    // Add path import if not present
-    if (!viteConfig.includes('import path from')) {
-      viteConfig = viteConfig.replace(
-        "import { defineConfig } from 'vite'",
-        "import { defineConfig } from 'vite'\nimport path from 'path'"
-      )
-    }
-
-    // Add resolve.alias if not present
-    if (!viteConfig.includes('resolve:')) {
-      viteConfig = viteConfig.replace(
-        'plugins: [react()],',
-        `plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },`
-      )
-    }
-
-    await fs.writeFile(viteConfigPath, viteConfig, 'utf-8')
-  }
-}
 
 export function initializeGit(projectDir: string): void {
   try {
@@ -343,19 +266,28 @@ export async function scaffoldProject(inputs: UserInputs): Promise<void> {
   // Update template files (rename, replace placeholders)
   await updateTemplateFiles(targetDir, inputs)
 
-  // Apply style variant overlays
-  if (inputs.style && inputs.style !== 'vanilla') {
-    await applyVariantOverlay(targetDir, inputs.style)
+  // Apply style variant overlays (all styles including vanilla)
+  if (inputs.style) {
+    // Determine language from variant name (e.g., 'react-ts' includes '-ts')
+    const language = inputs.variant.includes('-ts') ? 'ts' : 'js'
 
-    // Post-processing for specific styles
-    if (inputs.style === 'shadcn') {
-      await setupShadcnPaths(targetDir)
+    // Determine framework type for variant path
+    const frameworkType = inputs.framework === 'nextjs' ? 'nextjs' : 'react'
+
+    // Build variant path with language layer: style/language/framework
+    let variantPath = `${inputs.style}/${language}/${frameworkType}`
+
+    // For React templates, check if SWC-specific variant exists
+    if (frameworkType === 'react' && inputs.variant.includes('-swc')) {
+      // Check if SWC-specific variant exists (for tailwind and shadcn)
+      const swcVariantPath = `${inputs.style}/${language}/react-swc`
+      const swcVariantDir = path.join(VARIANTS_DIR, swcVariantPath)
+      if (await fs.pathExists(swcVariantDir)) {
+        variantPath = swcVariantPath
+      }
     }
 
-    // Create PostCSS config for Next.js with Tailwind/shadcn
-    if (inputs.framework === 'nextjs' && (inputs.style === 'tailwind' || inputs.style === 'shadcn')) {
-      await createPostCSSConfig(targetDir)
-    }
+    await applyVariantOverlay(targetDir, variantPath)
   }
 
   // Add ESLint and Prettier configs if needed
@@ -464,14 +396,3 @@ export async function createPrettierConfig(projectDir: string): Promise<void> {
   })
 }
 
-export async function createPostCSSConfig(projectDir: string): Promise<void> {
-  const configContent = `const config = {
-  plugins: {
-    "@tailwindcss/postcss": {},
-  },
-};
-export default config;
-`
-
-  await fs.writeFile(path.join(projectDir, 'postcss.config.mjs'), configContent, 'utf-8')
-}

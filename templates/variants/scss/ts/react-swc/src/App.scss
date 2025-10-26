@@ -1,0 +1,58 @@
+@import './styles/variables';
+@import './styles/mixins';
+
+.app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: $spacing-md;
+  text-align: center;
+
+  &__logo {
+    height: 6em;
+    padding: $spacing-md;
+    will-change: filter;
+    transition: filter 300ms;
+
+    &:hover {
+      filter: drop-shadow(0 0 2em #646cffaa);
+    }
+
+    &--react:hover {
+      filter: drop-shadow(0 0 2em #61dafbaa);
+    }
+
+    @include respond-to('md') {
+      height: 8em;
+    }
+  }
+
+  &__card {
+    @include card;
+    padding: $spacing-lg;
+  }
+
+  &__header {
+    @include flex-column;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .app__logo--animated {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.read-the-docs {
+  color: #888;
+}

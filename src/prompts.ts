@@ -161,11 +161,10 @@ export function getStyleOptions(framework: string, variant: string): typeof STYL
     { title: 'Tailwind CSS', value: 'tailwind' },
   ]
 
-  // shadcn is only available for TypeScript variants in React and Next.js
-  const isTypeScript = variant.includes('-ts')
+  // shadcn is available for both JS and TS in React and Next.js
   const isReactOrNext = framework === 'react' || framework === 'nextjs'
 
-  if (isReactOrNext && isTypeScript) {
+  if (isReactOrNext) {
     return [...baseOptions, { title: 'Tailwind CSS + shadcn/ui', value: 'shadcn' }]
   }
 
