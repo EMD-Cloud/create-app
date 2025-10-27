@@ -1,6 +1,6 @@
 {
   "name": "@emd-cloud/create-app",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "module",
   "description": "Create EMD Cloud projects with your choice of framework, language, and styling",
   "author": "Vladislav Pavlik <vpavlik@emd.one>",
