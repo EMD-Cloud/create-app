@@ -54,15 +54,15 @@ describe('prompts.ts', () => {
     it('should return base options for non-TypeScript React variants', () => {
       const options = getStyleOptions('react', 'react')
 
-      expect(options).toHaveLength(3)
-      expect(options.map(o => o.value)).toEqual(['vanilla', 'scss', 'tailwind'])
+      expect(options).toHaveLength(4)
+      expect(options.map(o => o.value)).toEqual(['vanilla', 'scss', 'tailwind', 'shadcn'])
     })
 
     it('should return base options for non-TypeScript Next.js variants', () => {
       const options = getStyleOptions('nextjs', 'nextjs')
 
-      expect(options).toHaveLength(3)
-      expect(options.map(o => o.value)).toEqual(['vanilla', 'scss', 'tailwind'])
+      expect(options).toHaveLength(4)
+      expect(options.map(o => o.value)).toEqual(['vanilla', 'scss', 'tailwind', 'shadcn'])
     })
 
     it('should include shadcn for TypeScript React variants', () => {
@@ -86,11 +86,11 @@ describe('prompts.ts', () => {
       expect(options.map(o => o.value)).toEqual(['vanilla', 'scss', 'tailwind', 'shadcn'])
     })
 
-    it('should NOT include shadcn for SWC without TypeScript', () => {
+    it('should include shadcn for SWC (JavaScript support)', () => {
       const options = getStyleOptions('react', 'react-swc')
 
-      expect(options).toHaveLength(3)
-      expect(options.map(o => o.value)).not.toContain('shadcn')
+      expect(options).toHaveLength(4)
+      expect(options.map(o => o.value)).toContain('shadcn')
     })
 
     it('should return base options for non-React/Next.js frameworks', () => {
