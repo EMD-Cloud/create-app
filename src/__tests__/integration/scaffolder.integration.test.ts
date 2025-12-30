@@ -38,10 +38,9 @@ describe('scaffolder integration', () => {
       expect(config.dependencies).toHaveProperty('@reduxjs/toolkit')
       expect(config.dependencies).toHaveProperty('react-redux')
 
-      // Verify ESLint dependencies
+      // Verify ESLint dependencies (neostandard bundles all plugins)
       expect(config.devDependencies).toHaveProperty('eslint')
-      expect(config.devDependencies).toHaveProperty('eslint-config-standard')
-      expect(config.devDependencies).toHaveProperty('eslint-plugin-react')
+      expect(config.devDependencies).toHaveProperty('neostandard')
 
       // Verify Prettier is always included
       expect(config.devDependencies).toHaveProperty('prettier')
@@ -67,9 +66,8 @@ describe('scaffolder integration', () => {
       // Verify TanStack Query
       expect(config.dependencies).toHaveProperty('@tanstack/react-query')
 
-      // Verify Airbnb ESLint
-      expect(config.devDependencies).toHaveProperty('eslint-config-airbnb')
-      expect(config.devDependencies).toHaveProperty('eslint-plugin-jsx-a11y')
+      // Verify Airbnb ESLint (eslint-config-airbnb-extended bundles all plugins)
+      expect(config.devDependencies).toHaveProperty('eslint-config-airbnb-extended')
     })
 
     it('should correctly resolve dependencies for Next.js + SCSS + Effector', async () => {
@@ -275,7 +273,7 @@ describe('scaffolder integration', () => {
       expect(config.dependencies).toHaveProperty('tailwindcss')
       expect(config.dependencies).toHaveProperty('class-variance-authority')
       expect(config.dependencies).toHaveProperty('@tanstack/react-query')
-      expect(config.devDependencies).toHaveProperty('eslint-config-airbnb')
+      expect(config.devDependencies).toHaveProperty('eslint-config-airbnb-extended')
       expect(config.devDependencies).toHaveProperty('prettier')
     })
 

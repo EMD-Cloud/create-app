@@ -311,9 +311,8 @@ describe('scaffolder.ts', () => {
       const config = await getPackageJsonConfig(inputs)
 
       expect(config.devDependencies).toHaveProperty('eslint')
-      expect(config.devDependencies).toHaveProperty('eslint-config-standard')
-      expect(config.devDependencies).toHaveProperty('eslint-plugin-react')
-      expect(config.devDependencies).toHaveProperty('eslint-plugin-react-hooks')
+      // neostandard bundles all necessary plugins
+      expect(config.devDependencies).toHaveProperty('neostandard')
     })
 
     it('should include ESLint Airbnb dependencies', async () => {
@@ -326,8 +325,8 @@ describe('scaffolder.ts', () => {
       const config = await getPackageJsonConfig(inputs)
 
       expect(config.devDependencies).toHaveProperty('eslint')
-      expect(config.devDependencies).toHaveProperty('eslint-config-airbnb')
-      expect(config.devDependencies).toHaveProperty('eslint-plugin-jsx-a11y')
+      // eslint-config-airbnb-extended bundles all necessary plugins
+      expect(config.devDependencies).toHaveProperty('eslint-config-airbnb-extended')
     })
 
     it('should always include Prettier', async () => {

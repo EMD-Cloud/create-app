@@ -150,10 +150,14 @@ const templateName = framework === 'nextjs'
 - Generates correct commands: `npm run dev` vs `yarn dev` vs `pnpm dev` vs `bun run dev`
 
 **ESLint Configuration**
-- Generated dynamically in `createEslintConfig()`
-- Extends differ by preset: "eslint:recommended" (standard) vs airbnb vs none
-- TypeScript projects include `plugin:@typescript-eslint/recommended`
-- Preset dependencies added to devDependencies automatically
+- Generated dynamically in `createEslintConfig()` using ESLint 9 flat config format
+- **Standard preset**: Uses `neostandard` package (successor to eslint-config-standard for ESLint 9)
+  - Built-in TypeScript support via `ts: true` option
+- **Airbnb preset**: Uses `eslint-config-airbnb-extended` package (ESLint 9 compatible)
+  - Built-in React and TypeScript support
+- **Recommended preset**: Uses `@eslint/js` with `eslint-plugin-react` and `eslint-plugin-react-hooks`
+  - TypeScript support via `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser`
+- Both neostandard and airbnb-extended bundle all necessary plugins
 
 **Prettier Configuration**
 - Same config for all projects

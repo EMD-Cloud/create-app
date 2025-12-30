@@ -109,26 +109,25 @@ export async function getPackageJsonConfig(inputs: UserInputs): Promise<Template
   // Add ESLint dependencies
   if (inputs.eslintPreset !== 'none') {
     config.devDependencies['eslint'] = '^9.17.0'
-    config.devDependencies['@eslint/js'] = '^9.17.0'
-    config.devDependencies['eslint-plugin-react'] = '^7.37.5'
-    config.devDependencies['eslint-plugin-react-hooks'] = '^5.1.0'
-
     if (inputs.eslintPreset === 'airbnb') {
-      config.devDependencies['eslint-config-airbnb'] = '^19.0.4'
-      config.devDependencies['eslint-plugin-import'] = '^2.29.0'
-      config.devDependencies['eslint-plugin-jsx-a11y'] = '^6.10.2'
+      // eslint-config-airbnb-extended bundles all necessary plugins for ESLint 9 flat config
+      config.devDependencies['eslint-config-airbnb-extended'] = '^5.0.0'
     } else if (inputs.eslintPreset === 'standard') {
-      config.devDependencies['eslint-config-standard'] = '^17.1.0'
-      config.devDependencies['eslint-plugin-import'] = '^2.31.0'
-      config.devDependencies['eslint-plugin-n'] = '^17.15.1'
-      config.devDependencies['eslint-plugin-promise'] = '^7.2.1'
-    }
+      // neostandard bundles all necessary plugins for ESLint 9 flat config
+      // TypeScript support is enabled via the ts: true option
+      config.devDependencies['neostandard'] = '^0.12.1'
+    } else {
+      // Default/recommended preset needs explicit plugin dependencies
+      config.devDependencies['@eslint/js'] = '^9.17.0'
+      config.devDependencies['eslint-plugin-react'] = '^7.37.5'
+      config.devDependencies['eslint-plugin-react-hooks'] = '^5.1.0'
 
-    // Add TypeScript ESLint support for TypeScript variants
-    const isTypeScript = inputs.variant.includes('-ts')
-    if (isTypeScript) {
-      config.devDependencies['@typescript-eslint/eslint-plugin'] = '^8.20.0'
-      config.devDependencies['@typescript-eslint/parser'] = '^8.20.0'
+      // Add TypeScript ESLint support for TypeScript variants
+      const isTypeScript = inputs.variant.includes('-ts')
+      if (isTypeScript) {
+        config.devDependencies['@typescript-eslint/eslint-plugin'] = '^8.20.0'
+        config.devDependencies['@typescript-eslint/parser'] = '^8.20.0'
+      }
     }
   }
 
@@ -308,76 +307,77 @@ export async function createEslintConfig(
   inputs: UserInputs
 ): Promise<void> {
   const isTypeScript = inputs.variant.includes('-ts')
+  let configContent = ''
 
-  // Generate ESLint flat config (eslint.config.js)
-  let configContent = `import js from '@eslint/js'\n`
+  if (inputs.eslintPreset === 'standard') {
+    // neostandard provides a complete flat config with built-in TypeScript support
+    configContent = `import neostandard from 'neostandard'\n\n`
+    configContent += `export default neostandard({\n`
+    if (isTypeScript) {
+      configContent += `  ts: true,\n`
+    }
+    configContent += `})\n`
+  } else if (inputs.eslintPreset === 'airbnb') {
+    // eslint-config-airbnb-extended provides ESLint 9 flat config support
+    configContent = `import { createAirbnbConfig } from 'eslint-config-airbnb-extended'\n\n`
+    configContent += `export default createAirbnbConfig({\n`
+    configContent += `  react: true,\n`
+    if (isTypeScript) {
+      configContent += `  typescript: true,\n`
+    }
+    configContent += `})\n`
+  } else {
+    // Default recommended config
+    configContent = `import js from '@eslint/js'\n`
+    configContent += `import reactPlugin from 'eslint-plugin-react'\n`
+    configContent += `import reactHooksPlugin from 'eslint-plugin-react-hooks'\n`
 
-  // Add imports based on preset
-  if (inputs.eslintPreset === 'airbnb') {
-    configContent += `import airbnb from 'eslint-config-airbnb'\n`
-    configContent += `import airbnbHooks from 'eslint-config-airbnb/hooks'\n`
-  } else if (inputs.eslintPreset === 'standard') {
-    configContent += `import standard from 'eslint-config-standard'\n`
-  }
+    if (isTypeScript) {
+      configContent += `import tseslint from '@typescript-eslint/eslint-plugin'\n`
+      configContent += `import tsParser from '@typescript-eslint/parser'\n`
+    }
 
-  configContent += `import reactPlugin from 'eslint-plugin-react'\n`
-  configContent += `import reactHooksPlugin from 'eslint-plugin-react-hooks'\n`
-
-  if (isTypeScript) {
-    configContent += `import tseslint from '@typescript-eslint/eslint-plugin'\n`
-    configContent += `import tsParser from '@typescript-eslint/parser'\n`
-  }
-
-  configContent += `\nexport default [\n`
-  configContent += `  js.configs.recommended,\n`
-
-  // Add preset config
-  if (inputs.eslintPreset === 'airbnb') {
-    configContent += `  airbnb,\n`
-    configContent += `  airbnbHooks,\n`
-  } else if (inputs.eslintPreset === 'standard') {
-    configContent += `  standard,\n`
-  }
-
-  // Main config object
-  configContent += `  {\n`
-  configContent += `    files: ['**/*.{js,jsx${isTypeScript ? ',ts,tsx' : ''}}'],\n`
-  configContent += `    languageOptions: {\n`
-  configContent += `      ecmaVersion: 'latest',\n`
-  configContent += `      sourceType: 'module',\n`
-  configContent += `      globals: {\n`
-  configContent += `        browser: true,\n`
-  configContent += `        es2021: true,\n`
-  configContent += `      },\n`
-
-  if (isTypeScript) {
-    configContent += `      parser: tsParser,\n`
-    configContent += `      parserOptions: {\n`
-    configContent += `        ecmaFeatures: { jsx: true },\n`
+    configContent += `\nexport default [\n`
+    configContent += `  js.configs.recommended,\n`
+    configContent += `  {\n`
+    configContent += `    files: ['**/*.{js,jsx${isTypeScript ? ',ts,tsx' : ''}}'],\n`
+    configContent += `    languageOptions: {\n`
+    configContent += `      ecmaVersion: 'latest',\n`
+    configContent += `      sourceType: 'module',\n`
+    configContent += `      globals: {\n`
+    configContent += `        browser: true,\n`
+    configContent += `        es2021: true,\n`
     configContent += `      },\n`
+
+    if (isTypeScript) {
+      configContent += `      parser: tsParser,\n`
+      configContent += `      parserOptions: {\n`
+      configContent += `        ecmaFeatures: { jsx: true },\n`
+      configContent += `      },\n`
+    }
+
+    configContent += `    },\n`
+    configContent += `    plugins: {\n`
+    configContent += `      react: reactPlugin,\n`
+    configContent += `      'react-hooks': reactHooksPlugin,\n`
+
+    if (isTypeScript) {
+      configContent += `      '@typescript-eslint': tseslint,\n`
+    }
+
+    configContent += `    },\n`
+    configContent += `    rules: {\n`
+    configContent += `      ...reactPlugin.configs.recommended.rules,\n`
+    configContent += `      ...reactHooksPlugin.configs.recommended.rules,\n`
+
+    if (isTypeScript) {
+      configContent += `      ...tseslint.configs.recommended.rules,\n`
+    }
+
+    configContent += `    },\n`
+    configContent += `  },\n`
+    configContent += `]\n`
   }
-
-  configContent += `    },\n`
-  configContent += `    plugins: {\n`
-  configContent += `      react: reactPlugin,\n`
-  configContent += `      'react-hooks': reactHooksPlugin,\n`
-
-  if (isTypeScript) {
-    configContent += `      '@typescript-eslint': tseslint,\n`
-  }
-
-  configContent += `    },\n`
-  configContent += `    rules: {\n`
-  configContent += `      ...reactPlugin.configs.recommended.rules,\n`
-  configContent += `      ...reactHooksPlugin.configs.recommended.rules,\n`
-
-  if (isTypeScript) {
-    configContent += `      ...tseslint.configs.recommended.rules,\n`
-  }
-
-  configContent += `    },\n`
-  configContent += `  },\n`
-  configContent += `]\n`
 
   await fs.writeFile(path.join(projectDir, 'eslint.config.js'), configContent, 'utf-8')
 }
