@@ -11,8 +11,8 @@
   "dependencies": {
     "@emd-cloud/react-components": "^1.14.0",
     "@emd-cloud/sdk": "^1.11.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "tus-js-client": "^4.3.1",
     "uuid": "^13.0.0"
   },
